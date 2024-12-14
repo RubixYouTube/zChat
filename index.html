@@ -80,42 +80,34 @@
     </div>
   </div>
   <script>
-    // Connect to the WebSocket server
-    const ws = new WebSocket('ws://' + window.location.hostname + ':3000');
-    const messagesDiv = document.getElementById('messages');
-    const input = document.getElementById('messageInput');
+  // Dynamically get WebSocket URL based on current host
+  const ws = new WebSocket(
+    (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host
+  );
+  
+  const messagesDiv = document.getElementById('messages');
+  const input = document.getElementById('messageInput');
 
-    // Handle incoming messages
-    ws.onmessage = (event) => {
-      const message = document.createElement('div');
-      message.textContent = event.data;
-      messagesDiv.appendChild(message);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    };
+  // Handle incoming messages
+  ws.onmessage = (event) => {
+    const message = document.createElement('div');
+    message.textContent = event.data;
+    messagesDiv.appendChild(message);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
 
-    // Send a message to the server
-    function sendMessage() {
-      const message = input.value.trim();
-      if (message) {
-        ws.send(message);
-        input.value = '';
-      }
+  // Send a message to the server
+  function sendMessage() {
+    const message = input.value.trim();
+    if (message) {
+      ws.send(message);
+      input.value = '';
     }
+  }
 
-    // Notify when the WebSocket connection is open
-    ws.onopen = () => {
-      console.log('Connected to the WebSocket server.');
-    };
-
-    // Handle WebSocket errors
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    // Notify when the WebSocket connection is closed
-    ws.onclose = () => {
-      console.log('Disconnected from the WebSocket server.');
-    };
-  </script>
+  ws.onopen = () => console.log('Connected to WebSocket server.');
+  ws.onclose = () => console.log('Disconnected from WebSocket server.');
+  ws.onerror = (error) => console.error('WebSocket error:', error);
+</script>
 </body>
 </html>
