@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>zChat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      background: #222;
+    }
+    .header div {
+      flex: 1;
+      text-align: center;
+      font-size: 20px;
+    }
+    .header .active {
+      color: lime;
+    }
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: calc(100vh - 50px);
+      padding: 10px;
+      background-image: radial-gradient(#555, #000);
+    }
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      border: 1px solid gray;
+      padding: 10px;
+      border-radius: 10px;
+      background: #333;
+    }
+    .input-box {
+      display: flex;
+      gap: 10px;
+    }
+    .input-box input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+    .input-box button {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      background-color: lime;
+      color: #000;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>zChat</div>
+    <div class="active">Home</div>
+    <div>Settings</div>
+  </div>
+  <div class="chat-box">
+    <div id="messages" class="messages"></div>
+    <div class="input-box">
+      <input type="text" id="messageInput" placeholder="Type Here">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <script>
+    // Connect to the global WebSocket server
+    const ws = new WebSocket('ws://<your-public-IP-or-domain>:3000');
+    const messagesDiv = document.getElementById('messages');
+    const input = document.getElementById('messageInput');
+
+    // Handle incoming messages
+    ws.onmessage = (event) => {
+      const message = document.createElement('div');
+      message.textContent = event.data;
+      messagesDiv.appendChild(message);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    };
+
+    // Send a message to the server
+    function sendMessage() {
+      const message = input.value.trim();
+      if (message) {
+        ws.send(message);
+        input.value = '';
+      }
+    }
+
+    // Notify when the WebSocket connection is open
+    ws.onopen = () => {
+      console.log('Connected to the WebSocket server.');
+    };
+
+    // Handle WebSocket errors
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    // Notify when the WebSocket connection is closed
+    ws.onclose = () => {
+      console.log('Disconnected from the WebSocket server.');
+    };
+  </script>
+</body>
+</html>
